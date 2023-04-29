@@ -7,6 +7,6 @@ import {
   getCustomers,
 } from "../controllers/customerController.js";
 
-router.route("/").post(registerCustomer);
+router.route("/").get(getCustomers).post(registerCustomer);
 
 export default router;
