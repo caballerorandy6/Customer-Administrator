@@ -5,8 +5,13 @@ const router = express.Router();
 import {
   registerCustomer,
   getCustomers,
+  authenticateCustomer,
+  confirmCustomerAcount,
 } from "../controllers/customerController.js";
 
-router.route("/").get(getCustomers).post(registerCustomer);
+router.get("/", getCustomers);
+router.post("/", registerCustomer);
+router.post("/login", authenticateCustomer);
+router.get("/confirm/:token", confirmCustomerAcount);
 
 export default router;

@@ -45,5 +45,10 @@ customerSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
+//Check password
+customerSchema.methods.checkPassword = async function (passwordForm) {
+  return await bcrypt.compare(passwordForm, this.password);
+};
+
 const Customer = mongoose.model("Customer", customerSchema);
 export default Customer;
