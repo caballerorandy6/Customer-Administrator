@@ -7,8 +7,8 @@ import generateJWT from "../helpers/generateJWT.js";
 const registerCustomer = async (req, res) => {
   try {
     const { email } = req.body;
-    const existCustomer = await Customer.findOne({ email });
 
+    const existCustomer = await Customer.findOne({ email });
     if (existCustomer) {
       const error = new Error("User already registered!");
       return res.status(400).json({ msg: error.message });
@@ -37,7 +37,7 @@ const authenticateCustomer = async (req, res) => {
   const customer = await Customer.findOne({ email });
 
   if (!customer) {
-    const error = new Error("User already authenticated!");
+    const error = new Error("The customer does not exist!");
     return res.status(404).json({ msg: error.message });
   }
 
@@ -53,7 +53,7 @@ const authenticateCustomer = async (req, res) => {
       _id: customer._id,
       name: customer.name,
       email: customer.email,
-      token: generateJWT(usuario._id),
+      token: generateJWT(customer._id),
     });
   } else {
     const error = new Error("Password incorrect!");
@@ -81,9 +81,77 @@ const confirmCustomerAcount = async (req, res) => {
   }
 };
 
+//Forgot Password
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  //Check if user exists
+  const customer = await Customer.findOne({ email });
+
+  if (!customer) {
+    const error = new Error("The customer does not exist!");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  try {
+    customer.token = generateId();
+    await customer.save();
+    res.json({ msg: "We have sent an email with instructions!" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//Check Token
+const checkToken = async (req, res) => {
+  const { token } = req.params;
+
+  const validToken = await Customer.findOne({ token });
+
+  if (validToken) {
+    res.json({ msg: "Valid token and existing customer!" });
+  } else {
+    const error = new Error("Invalid token!");
+    return res.status(404).json({ msg: error.message });
+  }
+};
+
+//New Password
+const newPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  const customer = await Customer.findOne({ token });
+
+  if (customer) {
+    customer.password = password;
+    customer.token = "";
+    try {
+      await customer.save();
+      res.json({ msg: "Password successfully changed!" });
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    const error = new Error("Invalid token!");
+    return res.status(404).json({ msg: error.message });
+  }
+};
+
+//Get Customer Profile
+const profile = (req, res) => {
+  const { customer } = req;
+
+  res.json(customer);
+};
+
 export {
   registerCustomer,
   getCustomers,
   authenticateCustomer,
   confirmCustomerAcount,
+  forgotPassword,
+  checkToken,
+  newPassword,
+  profile,
 };
