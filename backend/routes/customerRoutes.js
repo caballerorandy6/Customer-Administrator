@@ -20,9 +20,7 @@ router.post("/", registerCustomer);
 router.post("/login", authenticateCustomer);
 router.get("/confirm/:token", confirmCustomerAcount);
 router.post("/forgot-password", forgotPassword);
-
 router.route("/forgot-password/:token").get(checkToken).post(newPassword);
-
 router.get("/profile", checkAuth, profile);
 
 export default router;
